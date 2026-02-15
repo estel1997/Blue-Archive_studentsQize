@@ -9,9 +9,10 @@ import SwiftUI
 
 struct QuizView: View {
 
-    @StateObject private var vm = QuizViewModel(questionCount: 5, fetchLimitForDev: nil)
-    @Environment(\.dismiss) private var dismiss
-    @State private var resultScore: Int? = nil
+    @StateObject private var vm = QuizViewModel(questionCount: 5, fetchLimitForDev: 250)
+
+    let onFinish: (Int) -> Void
+    let onExitToTitle: () -> Void
 
     var body: some View {
         Group {
@@ -31,27 +32,11 @@ struct QuizView: View {
         .task {
             await vm.startIfNeeded()
         }
-        .onChange(of: vm.showResult) {
-            if vm.showResult {
-                resultScore = vm.totalScore
+        .onChange(of: vm.resultScore) {
+            _, newValue in
+            if let score = newValue {
+                onFinish(score)
             }
-        }
-        
-        .navigationDestination(item: $resultScore) { score in
-            ResultView(
-                score: score,
-                onRetry: {
-                    resultScore = nil
-                    Task { await vm.startGame()
-                    }
-                },
-                onExit: {
-                    resultScore = nil
-                    DispatchQueue.main.async{
-                        dismiss()
-                    }
-                }
-            )
         }
     }
 }
@@ -92,6 +77,7 @@ private struct ErrorView: View {
 private struct QuizContentView: View {
     let student: Student
     @ObservedObject var vm: QuizViewModel
+    @FocusState private var isAnswerFocused: Bool
 
     var body: some View {
         ZStack {
@@ -145,13 +131,19 @@ private struct QuizContentView: View {
                 Spacer(minLength: 0)
             }
             .padding(20)
+            .contentShape(Rectangle())
+            .onTapGesture {
+                isAnswerFocused = false
+            }
             
             .overlay {
                 if let popup = vm.resultPopup, let student = vm.currentStudent {
                     ResultPopupOverlay(
                         kind: popup,
                         student: student,
+                        earnedScore: vm.currentQuestionScore,
                         onNext: {
+                            isAnswerFocused = false
                             vm.resultPopup = nil
                             vm.revealedAnswerName = nil
                             vm.goNext()
@@ -177,12 +169,23 @@ private struct QuizContentView: View {
         VStack(alignment: .leading, spacing: 8) {
             TextField("キャラクター名を入力", text: $vm.answerText)
                 .textFieldStyle(.roundedBorder)
+                .focused($isAnswerFocused)
+                .submitLabel(.done)
+                .onSubmit {
+                    isAnswerFocused = false
+                    vm.submitAnswer()
+                }
 
             HStack {
-                Button("回答") { vm.submitAnswer() }
+                Button("回答") {
+                    isAnswerFocused = false
+                    vm.submitAnswer()
+                }
                     .buttonStyle(.borderedProminent)
 
-                Button("パス") { vm.pass() }
+                Button("パス") {
+                    isAnswerFocused = false
+                    vm.pass() }
                     .buttonStyle(.bordered)
 
                 Spacer()
@@ -254,12 +257,13 @@ private struct HintSlot: View {
 private struct ResultPopupOverlay: View {
     let kind: ResultPopup
     let student: Student
+    let earnedScore: Int
     let onNext: () -> Void
     
     var titleText: String {
         switch kind {
         case .correct:
-            return "正解です！！"
+            return "正解です！！ \(earnedScore)点獲得しました！！"
         case .passed:
             return "正解は\(student.name)でした！！"
         }
@@ -344,8 +348,4 @@ private struct RowCells3<L: View, M: View, R: View>: View {
         }
         .background(.ultraThinMaterial)
     }
-}
-
-#Preview {
-    QuizView()
 }

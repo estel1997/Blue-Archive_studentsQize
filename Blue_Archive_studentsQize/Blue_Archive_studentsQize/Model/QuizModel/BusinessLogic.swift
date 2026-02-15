@@ -7,11 +7,24 @@
 
 import Foundation
 
+enum AppState: Equatable {
+    case start
+    case quiz
+    case result(score: Int)
+}
+
 struct StudentsResponse: Decodable {
     let message: String
     let total: Int?
     let count: Int?
     let data: [Student]
+
+    enum CodingKeys: String, CodingKey {
+        case message = "message"
+        case total
+        case count
+        case data
+    }
 }
 
 struct Student: Decodable, Identifiable, Hashable {
@@ -133,6 +146,7 @@ enum AnswerJudgeResult: Equatable {
 struct AnswerJudgeRule {
     static let normal = AnswerJudgeRule()
 
+    
     func judge(input: String, correctName: String) -> AnswerJudgeResult {
         let inputN = normalizeForJudge(input)
 
@@ -177,6 +191,8 @@ struct AnswerJudgeRule {
     }
 }
 
+//extensionは既にある型（struct / class / enum）に後から機能を追加するもの
+//型の中に{}内のfuncを入れても同様の機能が得られるが、役割をコード毎に整理でき見やすい
 extension Student {
     func hintValue(for key: HintKey) -> String {
         switch key {

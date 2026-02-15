@@ -25,7 +25,7 @@ final class QuizViewModel: ObservableObject {
     @Published var revealedAnswerName: String? = nil
 
     @Published var answerText: String = ""
-    @Published var showResult: Bool = false
+    @Published var resultScore: Int? = nil
 
     private let api = BlueArchiveAPI()
 
@@ -36,8 +36,8 @@ final class QuizViewModel: ObservableObject {
     private let judgeRule: AnswerJudgeRule
 
     init(
-        questionCount: Int = 5,
-        fetchLimitForDev: Int? = nil,
+        questionCount: Int,
+        fetchLimitForDev: Int?,
         scoringRule: QuizScoringRule? = nil,
         judgeRule: AnswerJudgeRule? = nil
     ) {
@@ -45,7 +45,7 @@ final class QuizViewModel: ObservableObject {
         self.fetchLimitForDev = fetchLimitForDev
         self.scoringRule = scoringRule ?? .normal
         self.judgeRule = judgeRule ?? .normal
-    } // ?? ニル演算子 (左が nilじゃないなら左を使う。 左が nilなら右を使う)
+    }
 
     var currentStudent: Student? {
         guard currentIndex < questions.count else { return nil }
@@ -59,8 +59,6 @@ final class QuizViewModel: ObservableObject {
     var extraRevealsCount: Int {
         max(0, revealedHints.subtracting(initialHints).count)
     }
-    //subtracting　全体集合に()の値を除いた差集合
-    //max 呼び出した値から一番大きな値を取るための関数
     
     func remainingToUnlock(for key: HintKey) -> Int {
         max(0, key.requiredExtraReveals - extraRevealsCount)
@@ -90,7 +88,7 @@ final class QuizViewModel: ObservableObject {
         toastMessage = nil
         resultPopup = nil
         revealedAnswerName = nil
-        showResult = false
+        resultScore = nil
         
         do {
             let all = try await api.fetchStudents(limit: fetchLimitForDev)
@@ -128,7 +126,7 @@ final class QuizViewModel: ObservableObject {
         if key.requiredExtraReveals > 0 && !isUnlocked(key: key) {
             toastMessage = "ロック解除に必要な条件を達成していません"
             return
-        } // && 左と右の条件がtrueなら動作する
+        }
 
         revealedHints.insert(key)
         toastMessage = nil
@@ -143,8 +141,8 @@ final class QuizViewModel: ObservableObject {
             resultPopup = .correct
             toastMessage = nil
 
-        case .needVariant(let variant):
-            toastMessage = "衣装名（\(variant)）まで入力してください"
+        case .needVariant:
+            toastMessage = "入力と問題の生徒の名前が一致しませんでした"
 
         case .wrong:
             toastMessage = "入力と問題の生徒の名前が一致しませんでした"
@@ -168,11 +166,7 @@ final class QuizViewModel: ObservableObject {
         currentIndex += 1
 
         if currentIndex >= questions.count {
-            print("END -> showResult = true")
-            DispatchQueue.main.async{
-                self.showResult = true
-                // ユーザーランキングの更新などでタイマー、リアルタイム購読などがある場合はasync{ [weak self] in...などにするらしい。
-            }
+                self.resultScore = totalScore
             return
         } else {
             resetForNewQuestion()

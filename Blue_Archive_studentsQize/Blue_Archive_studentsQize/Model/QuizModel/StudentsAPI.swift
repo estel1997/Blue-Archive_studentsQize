@@ -37,7 +37,9 @@ struct BlueArchiveAPI {
 
     var request = URLRequest(url: url)
     request.httpMethod = "GET"
-    
+        
+      //  var requestA = URLRequest.init(url: url, timeoutInterval: 10.0 )
+        
     let (data,response) = try await URLSession.shared.data(for: request)
         
         guard let http = response as? HTTPURLResponse else{ throw APIError.badStatus(0)}
