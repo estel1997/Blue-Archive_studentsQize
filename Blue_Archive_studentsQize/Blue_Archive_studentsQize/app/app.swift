@@ -8,12 +8,15 @@
 import SwiftUI
 
 @main
+@MainActor
 struct Blue_Archive_studentsQizeApp: App {
+    @ObservedObject private var rankingViewModel = RankingViewModel()
+    @State private var appState: AppState = .start
+
     var body: some Scene {
         WindowGroup {
-            NavigationStack{
-                StartView()
-            }
+            RootView(appState: $appState)
+                .environmentObject(rankingViewModel)
         }
     }
 }
