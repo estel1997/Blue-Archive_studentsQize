@@ -1,74 +1,19 @@
-########################################
-# Swift / Xcode / SwiftUI
-########################################
+# Xcode
+DerivedData/
+*.xcuserstate
+*.xcworkspace/xcuserdata/
+*.xcodeproj/xcuserdata/
+
+# Swift Package Manager
+.build/
 
 # macOS
 .DS_Store
 
-# Xcode build
-DerivedData/
-build/
-Build/
-*.xcuserstate
-*.xcscmblueprint
-
-# User-specific Xcode settings
-xcuserdata/
-*.xcuserdatad/
-*.xccheckout
-
-# Xcode playgrounds
-timeline.xctimeline
-playground.xcworkspace
-
-# SwiftPM
-.build/
-Packages/
-Package.resolved
-# 共有したいなら↑Package.resolvedは消してOK（アプリは残すことも多い）
-
-# CocoaPods
-Pods/
-
-# Carthage
-Carthage/Build/
-
-# Fastlane
-fastlane/report.xml
-fastlane/Preview.html
-fastlane/screenshots/
-fastlane/test_output/
-
-# Code coverage
-*.xccovreport
-*.xccovarchive
-
-# Archives / dSYMs
-*.xcarchive
-*.dSYM
-*.dSYM.zip
-
-# Logs
-*.log
-
-########################################
-# Xcode Workspace (基本はコミット推奨)
-########################################
-# *.xcworkspace
-# ↑SwiftPM/通常のiOSアプリは .xcworkspace をコミットすることが多いのでデフォルトは除外しない
-
-########################################
-# Optional: Tuist / Mint / other tools
-########################################
-# Tuist
-.tuist-cache/
-Tuist/.build/
-Tuist/Dependencies/
-
-# Mint
-mint/
-
-########################################
-# Optional: SwiftLint / Cache
-########################################
-.swiftlint.cache
+# Local secrets
+.env
+.env.*
+Secrets.swift
+*.pem
+*.key
+*.p12
