@@ -1,19 +1,82 @@
-# Xcode
-DerivedData/
-*.xcuserstate
-*.xcworkspace/xcuserdata/
-*.xcodeproj/xcuserdata/
-
-# Swift Package Manager
-.build/
+########################################
+# Swift / Xcode / SwiftUI
+########################################
 
 # macOS
 .DS_Store
 
+# Xcode build
+DerivedData/
+build/
+Build/
+*.xcuserstate
+*.xcscmblueprint
+
+# User-specific Xcode settings
+xcuserdata/
+*.xcuserdatad/
+*.xccheckout
+*.xcworkspace/xcuserdata/
+*.xcodeproj/xcuserdata/
+
+# Xcode playgrounds
+timeline.xctimeline
+playground.xcworkspace
+
+# SwiftPM
+.build/
+Packages/
+Package.resolved
+
+# CocoaPods
+Pods/
+
+# Carthage
+Carthage/Build/
+
+# Fastlane
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots/
+fastlane/test_output/
+
+# Code coverage
+*.xccovreport
+*.xccovarchive
+
+# Archives / dSYMs
+*.xcarchive
+*.dSYM
+*.dSYM.zip
+
+# Logs
+*.log
+
+########################################
 # Local secrets
+########################################
+
 .env
 .env.*
 Secrets.swift
 *.pem
 *.key
 *.p12
+
+########################################
+# Xcode Workspace (基本はコミット推奨)
+########################################
+# *.xcworkspace
+
+########################################
+# Optional: Tuist / Mint / other tools
+########################################
+.tuist-cache/
+Tuist/.build/
+Tuist/Dependencies/
+mint/
+
+########################################
+# Optional: SwiftLint / Cache
+########################################
+.swiftlint.cache
